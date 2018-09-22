@@ -1,5 +1,19 @@
+apply plugin: 'com.novoda.bintray-release'
 apply plugin: 'java-library'
 
+publish {
+    def groupProjectID = 'me.blackdroid.annotaion'
+    def artifactProjectID = 'annotaion'
+    def publishVersionID = '1.0'
+
+    userOrg = 'nguyenngocan.hcmut'
+    repoName = 'annotaion'
+    groupId = groupProjectID
+    artifactId = artifactProjectID
+    publishVersion = publishVersionID
+    desc = 'Android library for displaying data based on JSON configuration fetched from server. With this library, you can kiss goodbye to string.xml, dimen.xml, arrays.xml. Keep all your string/integer/array config in one file. The library will automatically fetch the data from the url you provide.'
+    website = 'https://github.com/anitaa1990/Optimize'
+}
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 }
