@@ -70,8 +70,6 @@ public class NavComponentProcessor extends AbstractProcessor{
         return false;
     }
 
-
-
     private void createFile(String packageName, TypeSpec typeSpec) {
         try {
             JavaFile.builder(packageName, typeSpec).build().writeTo(filer);
@@ -79,7 +77,6 @@ public class NavComponentProcessor extends AbstractProcessor{
             e.printStackTrace();
         }
     }
-
 
     @Override
     public Set<String> getSupportedAnnotationTypes() {
