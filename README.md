@@ -30,7 +30,7 @@ public class DetailActivity extends AppCompatActivity {
 }
 ```
 
-To startActivity we use:
+To startActivity:
 ```java
         NavComponents.start(this, DetailActivity.class);
 ```
@@ -49,12 +49,12 @@ public class DetailActivity extends AppCompatActivity {
 }
 ```
 
-To startActivity we use:
+To startActivity with extra:
 ```java
         NavComponents.start(this, DetailActivity.class, "username", 13);
 ```
 
-Install
+#Getting Parceler
 ```
     implementation "me.blackdroid.annotation:annotation:1.1.1"
     kapt "me.blackdroid.processor:processor:1.1.1"
