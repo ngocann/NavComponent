@@ -7,15 +7,15 @@ ext {
     bintrayName = "me.blackdroid.annotation"
 
     publishedGroupId = 'me.blackdroid.annotation'
-    libraryName = 'navcomponent-api'
-    artifact = 'navcomponent-api'
+    libraryName = 'annotation'
+    artifact = 'annotation'
 
     libraryDescription = 'Utils for creating static navigation'
 
     siteUrl = 'https://github.com/ngocann/NavComponent.git'
     gitUrl = 'git@github.com:ngocann/NavComponent.git'
 
-    libraryVersion = '1.0.3'
+    libraryVersion = '1.1.1'
 
     developerId = ''
     developerName = ''
@@ -28,6 +28,8 @@ ext {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.google.android:android:4.1.1.4'
+
 }
 
 sourceCompatibility = "1.7"

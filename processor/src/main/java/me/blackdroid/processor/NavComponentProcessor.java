@@ -64,9 +64,6 @@ public class NavComponentProcessor extends AbstractProcessor{
             TypeSpec typeSpec = annotatedActivity.getTypeSpec();
             createFile(packageName, typeSpec);
         }
-
-        AnnotatedNavComponent annotatedNavComponent = new AnnotatedNavComponent(annotatedActivityList);
-        createFile(annotatedNavComponent.getPackageName(), annotatedNavComponent.getTypeSpec());
         return false;
     }
 

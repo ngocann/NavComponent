@@ -7,15 +7,15 @@ ext {
     bintrayName = "me.blackdroid.processor"
 
     publishedGroupId = 'me.blackdroid.processor'
-    libraryName = 'navcomponent'
-    artifact = 'navcomponent'
+    libraryName = 'processor'
+    artifact = 'processor'
 
     libraryDescription = 'Utils for creating static navigation'
 
     siteUrl = 'https://github.com/ngocann/NavComponent.git'
     gitUrl = 'git@github.com:ngocann/NavComponent.git'
 
-    libraryVersion = '1.0.3'
+    libraryVersion = '1.1.1'
 
     developerId = ''
     developerName = ''
@@ -29,10 +29,13 @@ ext {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation project(':annotation')
+//    implementation project(':annotation')
     implementation 'com.google.auto.service:auto-service:1.0-rc3'
     implementation 'com.squareup:javapoet:1.9.0'
     implementation 'com.google.android:android:4.1.1.4'
+    implementation 'org.parceler:parceler-api:1.1.11'
+    implementation 'me.blackdroid.annotation:annotation:1.1.1'
+
 }
 
 sourceCompatibility = "1.7"

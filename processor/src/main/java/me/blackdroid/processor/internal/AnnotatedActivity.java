@@ -9,6 +9,8 @@ import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 
+import org.parceler.Parcels;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,11 +22,13 @@ import javax.lang.model.element.PackageElement;
 import javax.lang.model.type.TypeMirror;
 
 import me.blackdroid.annotation.Extra;
+import me.blackdroid.annotation.ExtraParcel;
 
 public class AnnotatedActivity {
     String packageName;
     private List<Element> required = new ArrayList<>();
     private List<Element> optional = new ArrayList<>();
+    private List<Element> parcels = new ArrayList<>();
     private List<Element> all = new ArrayList<>();
     private Element annotatedElement;
     TypeName typeNameClass;
@@ -68,10 +72,17 @@ public class AnnotatedActivity {
                 .addModifiers(Modifier.PUBLIC);
         for (Element e : required) {
             String paramName = getParamName(e);
-            builder.addField(TypeName.get(e.asType()), paramName, Modifier.PRIVATE, Modifier.FINAL);
+            builder.addField(TypeName.get(e.asType()), paramName, Modifier.PRIVATE);
             constructor.addParameter(TypeName.get(e.asType()), paramName);
             constructor.addStatement("this.$N = $N", paramName, paramName);
         }
+        for (Element e : parcels) {
+            String paramName = e.getSimpleName().toString();
+            builder.addField(TypeName.get(e.asType()), paramName, Modifier.PRIVATE);
+            constructor.addParameter(TypeName.get(e.asType()), paramName);
+            constructor.addStatement("this.$N = $N", paramName, paramName);
+        }
+
         builder.addMethod(constructor.build());
 
         for (Element e : optional) {
@@ -85,7 +96,15 @@ public class AnnotatedActivity {
                     .returns(ClassName.get(getPackageName(annotatedElement), name))
                     .build());
         }
+        //Constructor2
+        MethodSpec.Builder constructorInject = MethodSpec.constructorBuilder()
+                .addModifiers(Modifier.PUBLIC);
+        constructorInject.addParameter(TypeName.get(annotatedElement.asType()), "activity")
+                .addStatement("inject(activity)");
+        builder.addMethod(constructorInject.build());
 
+
+        //Build Method
         MethodSpec.Builder buildMethod = MethodSpec.methodBuilder("build")
                 .addModifiers(Modifier.PUBLIC)
                 .addParameter(Context.class, "context")
@@ -94,12 +113,18 @@ public class AnnotatedActivity {
             String paramName = getParamName(e);
             buildMethod.addStatement("intent.putExtra($S, $N)", paramName, paramName);
         }
+        for (Element e : parcels) {
+            String paramName = e.getSimpleName().toString();
+            buildMethod.addStatement("intent.putExtra($S, $T.wrap($N))", paramName, Parcels.class,  paramName);
+        }
+
         buildMethod.returns(Intent.class)
                 .addStatement("return intent");
         builder.addMethod(buildMethod.build());
 
+        //Inject Method
         MethodSpec.Builder injectMethod = MethodSpec.methodBuilder("inject")
-                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .addModifiers(Modifier.PUBLIC)
                 .addParameter(TypeName.get(annotatedElement.asType()), "activity")
                 .addStatement("$T intent = activity.getIntent()", Intent.class)
                 .addStatement("$T extras = intent.getExtras()", Bundle.class);
@@ -112,8 +137,17 @@ public class AnnotatedActivity {
                     .addStatement("activity.$N = null", e.getSimpleName().toString())
                     .endControlFlow();
         }
+        for (Element e : parcels) {
+            String paramName = e.getSimpleName().toString();
+            injectMethod.beginControlFlow("if (extras.containsKey($S))", paramName)
+                    .addStatement("activity.$N = Parcels.unwrap(extras.getParcelable($S))", e.getSimpleName().toString(), paramName)
+                    .nextControlFlow("else")
+                    .addStatement("activity.$N = null", e.getSimpleName().toString())
+                    .endControlFlow();
+        }
         builder.addMethod(injectMethod.build());
 
+        //Getter Method
         for (Element e : all) {
             String paramName = e.getSimpleName().toString();
             MethodSpec.Builder getterMethod = MethodSpec
@@ -140,16 +174,17 @@ public class AnnotatedActivity {
             startMethod.addParameter(TypeName.get(element.asType()), paramName);
             startMethod.addStatement("intent.putExtra($S, $N)",  paramName, paramName);
         }
+        for (Element element : parcels) {
+            String paramName = element.getSimpleName().toString();
+            startMethod.addParameter(TypeName.get(element.asType()), paramName);
+            startMethod.addStatement("intent.putExtra($S, $T.wrap($N))",  paramName,Parcels.class,  paramName);
+        }
+
         startMethod.addStatement("context.startActivity(intent)");
         builder.addMethod(startMethod.build());
         return builder.build();
     }
 
-    private boolean isParcelable(Element e) {
-        TypeMirror serializable = processingEnvironment.getElementUtils().getTypeElement("android.os.Parcelable").asType();
-        boolean isParcelable = processingEnvironment.getTypeUtils().isAssignable(e.asType(), serializable);
-        return isParcelable;
-    }
     public TypeName getClassName() {
         return typeNameClass;
     }
@@ -170,12 +205,15 @@ public class AnnotatedActivity {
 
     private void getAnnotatedFields(Element annotatedElement, List<Element> required, List<Element> optional) {
         for (Element e : annotatedElement.getEnclosedElements()) {
-            if (e.getAnnotation(Extra.class) != null) {
+            if (e.getAnnotation(Extra.class) != null ) {
                 if (hasAnnotation(e, "Nullable")) {
                     optional.add(e);
                 } else {
                     required.add(e);
                 }
+            }
+            if (e.getAnnotation(ExtraParcel.class) != null) {
+                parcels.add(e);
             }
         }
     }
