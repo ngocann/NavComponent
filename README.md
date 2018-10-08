@@ -54,7 +54,7 @@ To startActivity with extra:
         NavComponents.start(this, DetailActivity.class, "username", 13);
 ```
 
-# Getting Parceler
+# Getting NavComponent
 ```
     implementation "me.blackdroid.annotation:annotation:1.1.1"
     kapt "me.blackdroid.processor:processor:1.1.1"
