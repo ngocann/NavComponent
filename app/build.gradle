@@ -27,10 +27,8 @@ dependencies {
     implementation 'org.parceler:parceler-api:1.1.11'
     annotationProcessor 'org.parceler:parceler:1.1.11'
 
-//    implementation project(':annotation')
-//    annotationProcessor project(":processor")
-    implementation 'me.blackdroid.annotation:annotation:1.1.1'
-    annotationProcessor 'me.blackdroid.processor:processor:1.1.1'
+    implementation project(':annotation')
+    annotationProcessor project(":processor")
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'

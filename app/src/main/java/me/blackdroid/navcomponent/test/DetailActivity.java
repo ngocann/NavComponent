@@ -15,12 +15,8 @@ import me.blackdroid.annotation.NavComponents;
 @NavComponent
 public class DetailActivity extends AppCompatActivity {
 
-   @Extra
-   String username;
-//   @Extra Account account;
-//
+   @Extra String username;
    @Extra Integer value = 0;
-//
    @ExtraParcel Info info;
 
     @Override
