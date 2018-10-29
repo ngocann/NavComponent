@@ -9,4 +9,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.SOURCE)
 public @interface Extra {
     String value() default "";
+    boolean required() default true;
+    String key() default "";
 }

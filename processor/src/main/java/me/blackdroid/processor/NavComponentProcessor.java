@@ -26,7 +26,7 @@ import javax.tools.Diagnostic;
 
 import me.blackdroid.annotation.NavComponent;
 import me.blackdroid.processor.internal.AnnotatedActivity;
-import me.blackdroid.processor.internal.AnnotatedNavComponent;
+import me.blackdroid.processor.internal.ProcessingException;
 
 @AutoService(Processor.class)
 public class NavComponentProcessor extends AbstractProcessor{
@@ -44,11 +44,15 @@ public class NavComponentProcessor extends AbstractProcessor{
 
     @Override
     public boolean process(Set<? extends TypeElement> set, RoundEnvironment roundEnvironment) {
-        findAnnotation(roundEnvironment);
+        try {
+            findAnnotation(roundEnvironment);
+        } catch (ProcessingException e) {
+            e.printStackTrace();
+        }
         return true;
     }
 
-    private boolean findAnnotation(RoundEnvironment roundEnvironment) {
+    private boolean findAnnotation(RoundEnvironment roundEnvironment) throws ProcessingException {
         List<AnnotatedActivity> annotatedActivityList = new ArrayList<>();
         for(Element element : roundEnvironment.getElementsAnnotatedWith(NavComponent.class)){
             if(element.getKind() != ElementKind.CLASS){
@@ -61,7 +65,7 @@ public class NavComponentProcessor extends AbstractProcessor{
 
         for (AnnotatedActivity annotatedActivity : annotatedActivityList) {
             String packageName = annotatedActivity.getPackageName();
-            TypeSpec typeSpec = annotatedActivity.getTypeSpec();
+            TypeSpec typeSpec = annotatedActivity.getTypeSpec2();
             createFile(packageName, typeSpec);
         }
         return false;
