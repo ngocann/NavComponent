@@ -8,4 +8,5 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.SOURCE)
 public @interface ExtraParcel {
+    String key() default "";
 }

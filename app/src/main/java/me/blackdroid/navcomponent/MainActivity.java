@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import me.blackdroid.annotation.NavComponents;
 import me.blackdroid.navcomponent.test.DetailActivity;
+import me.blackdroid.navcomponent.test.DetailActivityKotlin;
 import me.blackdroid.navcomponent.test.Info;
 
 public class MainActivity extends AppCompatActivity {
@@ -16,7 +17,7 @@ public class MainActivity extends AppCompatActivity {
         Info info = new Info();
         info.setName("name");
         info.setAge("age");
-        NavComponents.start(this, DetailActivity.class, "bbb", 13, info);
+        NavComponents.start(this, DetailActivityKotlin.class, "bbb", 13, info);
     }
 
 

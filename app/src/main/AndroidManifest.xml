@@ -17,6 +17,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".test.DetailActivity" />
+        <activity android:name=".test.DetailActivityKotlin" />
     </application>
 
 </manifest>
