@@ -44,15 +44,11 @@ public class NavComponentProcessor extends AbstractProcessor{
 
     @Override
     public boolean process(Set<? extends TypeElement> set, RoundEnvironment roundEnvironment) {
-        try {
-            findAnnotation(roundEnvironment);
-        } catch (ProcessingException e) {
-            e.printStackTrace();
-        }
+        findAnnotation(roundEnvironment);
         return true;
     }
 
-    private boolean findAnnotation(RoundEnvironment roundEnvironment) throws ProcessingException {
+    private boolean findAnnotation(RoundEnvironment roundEnvironment){
         List<AnnotatedActivity> annotatedActivityList = new ArrayList<>();
         for(Element element : roundEnvironment.getElementsAnnotatedWith(NavComponent.class)){
             if(element.getKind() != ElementKind.CLASS){
@@ -91,3 +87,5 @@ public class NavComponentProcessor extends AbstractProcessor{
 
 
 }
+
+

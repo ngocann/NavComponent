@@ -25,18 +25,16 @@ public class ExtraAnnotatedField {
   private final String type;
   private final Element element;
   private final boolean required;
-  private final TypeElement classElement;
 
 
 
-  public ExtraAnnotatedField(Element element, TypeElement classElement, Extra annotation)
+  public ExtraAnnotatedField(Element element, Extra annotation)
       throws ProcessingException {
     this.name = element.getSimpleName().toString();
     this.key = getKey(element, annotation);
     this.type = element.asType().toString();
     this.element = element;
     this.required = annotation.required();
-    this.classElement = classElement;
   }
 
   private static String getKey(Element element, Extra annotation) {
@@ -106,9 +104,6 @@ public class ExtraAnnotatedField {
   }
 
 
-  public TypeElement getClassElement() {
-    return classElement;
-  }
 
   public String getVariableName() {
     return getVariableName(name);

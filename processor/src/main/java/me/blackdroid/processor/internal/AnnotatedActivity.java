@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
@@ -27,6 +28,7 @@ import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
+import javax.tools.Diagnostic;
 
 import me.blackdroid.annotation.Extra;
 import me.blackdroid.annotation.ExtraParcel;
@@ -45,14 +47,18 @@ public class AnnotatedActivity {
     private String classSimpleName;
     private ProcessingEnvironment processingEnvironment;
     private Map<String, ExecutableElement> setterMethods = new HashMap<String, ExecutableElement>();
+    private Messager messager;
 
     public AnnotatedActivity(Element annotatedElement, ProcessingEnvironment processingEnvironment) {
+        this.messager = processingEnvironment.getMessager();
         this.annotatedElement = annotatedElement;
         this.packageName = getPackageName(annotatedElement);
         typeNameClass = TypeName.get(annotatedElement.asType());
         classSimpleName = annotatedElement.getSimpleName().toString();
         this.processingEnvironment = processingEnvironment;
-        checkAndAddSetterMethod(annotatedElement);
+        for (Element element : annotatedElement.getEnclosedElements()) {
+            checkAndAddSetterMethod(element);
+        }
         getAnnotatedFields(annotatedElement, required, optional);
         try {
             getExtraAnnotatedFields(annotatedElement);
@@ -64,6 +70,12 @@ public class AnnotatedActivity {
         all.addAll(optional);
     }
 
+    private void error(Element e, String msg, Object... args) {
+        messager.printMessage(
+                Diagnostic.Kind.WARNING,
+                String.format(msg, args),
+                e);
+    }
     public void checkAndAddSetterMethod(Element classMember) {
 
         if (classMember.getKind() == ElementKind.METHOD) {
@@ -100,7 +112,7 @@ public class AnnotatedActivity {
         return all;
     }
 
-    public TypeSpec getTypeSpec2() throws ProcessingException {
+    public TypeSpec getTypeSpec2()  {
         final String name = String.format("%sNavComponent", annotatedElement.getSimpleName());
         TypeSpec.Builder builder = TypeSpec.classBuilder(name)
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL);
@@ -155,11 +167,10 @@ public class AnnotatedActivity {
                 ExecutableElement setterMethodElement = findSetterForField(field);
                 setterMethod = setterMethodElement.getSimpleName().toString();
                 injectMethod.beginControlFlow("if (extras.containsKey($S))", field.getName())
-                        .addStatement("activity.$T($N)",setterMethod, field.getName())
+                        .addStatement("activity.$N($N)",setterMethod, field.getName())
                         .nextControlFlow("else")
-                        .addStatement("activity.set$N(null)")
+                        .addStatement("activity.$N(null)", setterMethod)
                         .endControlFlow();
-
             }else {
                 injectMethod.beginControlFlow("if (extras.containsKey($S))", field.getName())
                         .addStatement("activity.$N = ($T) extras.get($S)", field.getName(), field.getElement().asType(), field.getName())
@@ -352,8 +363,9 @@ public class AnnotatedActivity {
         for (Element e : annotatedElement.getEnclosedElements()) {
             if (e.getAnnotation(Extra.class) != null ) {
                 if (hasAnnotation(e, "Nullable")) {
+                    requiredExtraList.add(new ExtraAnnotatedField(e, e.getAnnotation(Extra.class)));
                 } else {
-                    requiredExtraList.add(new ExtraAnnotatedField(e,(TypeElement) e.getEnclosingElement(), e.getAnnotation(Extra.class)));
+                    requiredExtraList.add(new ExtraAnnotatedField(e, e.getAnnotation(Extra.class)));
                 }
             }
         }
@@ -383,7 +395,7 @@ public class AnnotatedActivity {
         return false;
     }
 
-    public ExecutableElement findSetterForField(ExtraAnnotatedField field) throws ProcessingException {
+    public ExecutableElement findSetterForField(ExtraAnnotatedField field)  {
 
         String fieldName = field.getVariableName();
         StringBuilder builder = new StringBuilder("set");
@@ -426,12 +438,9 @@ public class AnnotatedActivity {
                 return setterMethod; // setter method found
             }
         }
+        error(field.getElement(), "aaafindSetterForField");
+        return null;
 
-        throw new ProcessingException(field.getElement(), "The @%s annotated field '%s' in class %s has " +
-                "private visibility. Hence a corresponding non-private setter method must be provided " +
-                "called '%s(%s)'. Unfortunately this is not the case. Please add a setter method for " +
-                "this field!", Extra.class.getSimpleName(), field.getName(), methodName, methodName,
-                field.getType());
 
     }
 

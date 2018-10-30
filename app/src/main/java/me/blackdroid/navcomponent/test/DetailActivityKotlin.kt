@@ -10,6 +10,7 @@ import me.blackdroid.annotation.NavComponents
 @NavComponent
 class DetailActivityKotlin : AppCompatActivity() {
     @Extra var username : String? = null
+    @Extra var age : Int? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
