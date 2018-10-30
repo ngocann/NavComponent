@@ -55,6 +55,7 @@ public class NavComponentProcessor extends AbstractProcessor{
                 messager.printMessage(Diagnostic.Kind.ERROR, "@NavComponent should be on top of classes");
                 return true;
             }
+
             AnnotatedActivity annotatedActivity = new AnnotatedActivity(element, instance);
             annotatedActivityList.add(annotatedActivity);
         }
