@@ -7,6 +7,7 @@ import com.squareup.javapoet.TypeSpec;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -61,6 +62,8 @@ public class NavComponentProcessor extends AbstractProcessor{
         ARGUMENT_TYPES.put("android.os.Parcelable", "Parcelable");
     }
 
+    private static List<String> fragmentClass = Arrays.asList("android.app.Fragment","android.support.v4.app.Fragment","androidx.fragment.app.Fragment");
+
     @Override
     public synchronized void init(ProcessingEnvironment processingEnvironment) {
         instance = processingEnvironment;
@@ -74,6 +77,9 @@ public class NavComponentProcessor extends AbstractProcessor{
         return true;
     }
 
+    private boolean isClassFragment(Element element) {
+        return ElementUtils.isClass(processingEnv, element, fragmentClass);
+    }
     private boolean findAnnotation(RoundEnvironment roundEnvironment){
         List<AnnotatedActivity> annotatedActivityList = new ArrayList<>();
         for(Element element : roundEnvironment.getElementsAnnotatedWith(NavComponent.class)){
@@ -81,9 +87,11 @@ public class NavComponentProcessor extends AbstractProcessor{
                 messager.printMessage(Diagnostic.Kind.ERROR, "@NavComponent should be on top of classes");
                 return true;
             }
-
-            AnnotatedActivity annotatedActivity = new AnnotatedActivity(element, instance);
-            annotatedActivityList.add(annotatedActivity);
+            if (isClassFragment(element)) {
+            }else {
+                AnnotatedActivity annotatedActivity = new AnnotatedActivity(element, instance);
+                annotatedActivityList.add(annotatedActivity);
+            }
         }
 
         for (AnnotatedActivity annotatedActivity : annotatedActivityList) {
