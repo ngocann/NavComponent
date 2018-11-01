@@ -13,7 +13,7 @@ import me.blackdroid.annotation.NavComponent;
 import me.blackdroid.annotation.NavComponents;
 
 @NavComponent
-public class DetailActivity extends AppCompatActivity {
+public class DetailActivity extends BaseActivity {
 
    @Extra String username;
    @Extra(key = "BUNDLE_VALUE")

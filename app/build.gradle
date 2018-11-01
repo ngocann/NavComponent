@@ -1,6 +1,4 @@
 apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion 28
@@ -27,15 +25,14 @@ dependencies {
 
 
     implementation 'org.parceler:parceler-api:1.1.11'
-    kapt 'org.parceler:parceler:1.1.11'
+    annotationProcessor 'org.parceler:parceler:1.1.11'
 
     implementation project(':annotation')
-    kapt project(":processor")
+    annotationProcessor project(":processor")
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
 repositories {
     mavenCentral()

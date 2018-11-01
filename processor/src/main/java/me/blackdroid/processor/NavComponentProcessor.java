@@ -8,7 +8,9 @@ import com.squareup.javapoet.TypeSpec;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -34,6 +36,30 @@ public class NavComponentProcessor extends AbstractProcessor{
     public static ProcessingEnvironment instance;
     private Filer filer;
     private Messager messager;
+    private static final Map<String, String> ARGUMENT_TYPES =
+            new HashMap<String, String>(20);
+    static {
+        ARGUMENT_TYPES.put("java.lang.String", "String");
+        ARGUMENT_TYPES.put("int", "Int");
+        ARGUMENT_TYPES.put("java.lang.Integer", "Int");
+        ARGUMENT_TYPES.put("long", "Long");
+        ARGUMENT_TYPES.put("java.lang.Long", "Long");
+        ARGUMENT_TYPES.put("double", "Double");
+        ARGUMENT_TYPES.put("java.lang.Double", "Double");
+        ARGUMENT_TYPES.put("short", "Short");
+        ARGUMENT_TYPES.put("java.lang.Short", "Short");
+        ARGUMENT_TYPES.put("float", "Float");
+        ARGUMENT_TYPES.put("java.lang.Float", "Float");
+        ARGUMENT_TYPES.put("byte", "Byte");
+        ARGUMENT_TYPES.put("java.lang.Byte", "Byte");
+        ARGUMENT_TYPES.put("boolean", "Boolean");
+        ARGUMENT_TYPES.put("java.lang.Boolean", "Boolean");
+        ARGUMENT_TYPES.put("char", "Char");
+        ARGUMENT_TYPES.put("java.lang.Character", "Char");
+        ARGUMENT_TYPES.put("java.lang.CharSequence", "CharSequence");
+        ARGUMENT_TYPES.put("android.os.Bundle", "Bundle");
+        ARGUMENT_TYPES.put("android.os.Parcelable", "Parcelable");
+    }
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnvironment) {
