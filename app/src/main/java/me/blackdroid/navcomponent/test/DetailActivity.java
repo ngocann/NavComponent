@@ -4,11 +4,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
 import me.blackdroid.annotation.Extra;
-import me.blackdroid.annotation.ExtraParcel;
 import me.blackdroid.annotation.NavComponent;
 import me.blackdroid.annotation.NavComponents;
 
@@ -18,7 +16,8 @@ public class DetailActivity extends BaseActivity {
    @Extra String username;
    @Extra(key = "BUNDLE_VALUE")
    Integer value = 0;
-   @ExtraParcel Info info;
+   @Extra(parceler = true, key = "BUNDLE_INFO")
+   Info info;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

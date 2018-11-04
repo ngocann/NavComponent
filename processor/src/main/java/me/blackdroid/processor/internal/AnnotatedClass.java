@@ -1,33 +1,23 @@
 package me.blackdroid.processor.internal;
 
-import android.content.Context;
-import android.content.Intent;
-import android.os.Bundle;
-
-import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
-
-import org.parceler.Parcels;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.Modifier;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.VariableElement;
 import javax.tools.Diagnostic;
 
 import me.blackdroid.annotation.Extra;
-import me.blackdroid.annotation.ExtraParcel;
 import me.blackdroid.processor.ModifierUtils;
 
 public abstract class AnnotatedClass {
@@ -107,8 +97,6 @@ public abstract class AnnotatedClass {
         for (Element e : annotatedElement.getEnclosedElements()) {
             if (e.getAnnotation(Extra.class) != null) {
                 requiredExtraList.add(new ExtraAnnotatedField(e, e.getAnnotation(Extra.class)));
-            } else if (e.getAnnotation(ExtraParcel.class) != null) {
-                requiredExtraList.add(new ExtraParcelAnnotatedField(e, e.getAnnotation(ExtraParcel.class)));
             }
         }
     }

@@ -13,9 +13,9 @@ public class NavComponents {
 
     }
 
-    public static <T extends Activity> void bind(T activity) {
-        instantiateBinder(activity, suffix);
-    }
+//    public static <T extends Activity> void bind(T activity) {
+//        instantiateBinder(activity, suffix);
+//    }
 
     public static void bind(Object fragment) {
         instantiateBinder(fragment, suffix);

@@ -18,12 +18,12 @@ public class MainActivity extends AppCompatActivity {
         info.setName("name");
         info.setAge("age");
 
-//        NavComponents.start(this, DetailActivityKotlin.class, "bbb", 13, info);
+        NavComponents.start(this, DetailActivity.class, "bbb", 13, info);
 
-        getSupportFragmentManager().beginTransaction()
-                .add(R.id.frame, NavFragmentNavComponent.newInstance("username", 12))
-                .commit()
-        ;
+//        getSupportFragmentManager().beginTransaction()
+//                .add(R.id.frame, NavFragmentNavComponent.newInstance("username", 12))
+//                .commit()
+//        ;
     }
 
 

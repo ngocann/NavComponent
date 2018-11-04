@@ -4,35 +4,18 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 
 import org.parceler.Parcels;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
-import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
-import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
-import javax.lang.model.element.PackageElement;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.TypeMirror;
-import javax.tools.Diagnostic;
-
-import me.blackdroid.annotation.Extra;
-import me.blackdroid.annotation.ExtraParcel;
-import me.blackdroid.processor.ModifierUtils;
 
 public class AnnotatedActivity  extends AnnotatedClass{
 
@@ -40,33 +23,15 @@ public class AnnotatedActivity  extends AnnotatedClass{
         super(annotatedElement, processingEnvironment);
     }
 
-
     @Override
     public TypeSpec getTypeSpec() {
         final String name = String.format("%sNavComponent", annotatedElement.getSimpleName());
         TypeSpec.Builder builder = TypeSpec.classBuilder(name)
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL);
 
-        //Constructor
-        MethodSpec.Builder constructor = MethodSpec.constructorBuilder()
-                .addModifiers(Modifier.PUBLIC);
-        for (AnnotatedField e : requiredExtraList) {
-            builder.addField(e.getTypeName(), e.getName(), Modifier.PRIVATE);
-            constructor.addParameter(e.getTypeName(), e.getName());
-            constructor.addStatement("this.$N = $N", e.getName(), e.getName());
-        }
-        builder.addMethod(constructor.build());
-
-        //Constructor2
-        MethodSpec.Builder constructorInject = MethodSpec.constructorBuilder()
-                .addModifiers(Modifier.PUBLIC);
-        constructorInject.addParameter(TypeName.get(annotatedElement.asType()), "activity")
-                .addStatement("inject(activity)");
-        builder.addMethod(constructorInject.build());
-
         //Inject Method
         MethodSpec.Builder injectMethod = MethodSpec.methodBuilder("inject")
-                .addModifiers(Modifier.PUBLIC)
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addParameter(TypeName.get(annotatedElement.asType()), "activity")
                 .addStatement("$T intent = activity.getIntent()", Intent.class)
                 .addStatement("$T extras = intent.getExtras()", Bundle.class);
@@ -81,7 +46,7 @@ public class AnnotatedActivity  extends AnnotatedClass{
             if (useSetter) {
                 ExecutableElement setterMethodElement = findSetterForField(field);
                 setterMethod = setterMethodElement.getSimpleName().toString();
-                if (field instanceof ExtraAnnotatedField) {
+                if (field instanceof ExtraAnnotatedField && !((ExtraAnnotatedField) field).isParceler()) {
                     injectMethod.beginControlFlow("if (extras.containsKey($S))", field.getKey())
                             .addStatement("activity.$N(($T) extras.get($S))", setterMethod, field.getTypeName(), field.getKey())
                             .nextControlFlow("else")
@@ -95,7 +60,7 @@ public class AnnotatedActivity  extends AnnotatedClass{
                             .endControlFlow();
                 }
             } else {
-                if (field instanceof ExtraAnnotatedField) {
+                if (field instanceof ExtraAnnotatedField && !((ExtraAnnotatedField) field).isParceler()) {
                     injectMethod.beginControlFlow("if (extras.containsKey($S))", field.getKey())
                             .addStatement("activity.$N = ($T) extras.get($S)", field.getName(), field.getElement().asType(), field.getKey())
                             .nextControlFlow("else")
@@ -120,9 +85,9 @@ public class AnnotatedActivity  extends AnnotatedClass{
                 .addStatement("$T intent = new Intent(context, $T.class)", Intent.class, typeNameClass);
         for (AnnotatedField field : requiredExtraList) {
             startMethod.addParameter(field.getTypeName(), field.getName());
-            if (field instanceof ExtraAnnotatedField) {
+            if (field instanceof ExtraAnnotatedField && !((ExtraAnnotatedField) field).isParceler()) {
                 startMethod.addStatement("intent.putExtra($S, $N)", field.getKey(), field.getName());
-            } else if (field instanceof ExtraParcelAnnotatedField) {
+            } else {
                 startMethod.addStatement("intent.putExtra($S, $T.wrap($N))", field.getKey(), Parcels.class, field.getName());
             }
         }
