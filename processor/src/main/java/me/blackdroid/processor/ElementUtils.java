@@ -1,8 +1,6 @@
 package me.blackdroid.processor;
 
-import com.sun.tools.internal.xjc.reader.TypeUtil;
 
-import java.util.Arrays;
 import java.util.List;
 
 import javax.annotation.processing.ProcessingEnvironment;
@@ -21,6 +19,7 @@ public class ElementUtils {
         }
         return false;
     }
+
     public static boolean isClass(ProcessingEnvironment env, Element classElement, String className) {
         TypeElement typeElement = env.getElementUtils().getTypeElement(className);
         Types typeUtils = env.getTypeUtils();

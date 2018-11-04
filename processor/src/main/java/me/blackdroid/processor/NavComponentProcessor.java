@@ -24,12 +24,12 @@ import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 
 import me.blackdroid.annotation.NavComponent;
 import me.blackdroid.processor.internal.AnnotatedActivity;
-import me.blackdroid.processor.internal.ProcessingException;
+import me.blackdroid.processor.internal.AnnotatedClass;
+import me.blackdroid.processor.internal.AnnotatedFragment;
 
 @AutoService(Processor.class)
 public class NavComponentProcessor extends AbstractProcessor{
@@ -78,25 +78,24 @@ public class NavComponentProcessor extends AbstractProcessor{
     }
 
     private boolean isClassFragment(Element element) {
-        return ElementUtils.isClass(processingEnv, element, fragmentClass);
+        return ElementUtils.isClass(instance, element, fragmentClass);
     }
     private boolean findAnnotation(RoundEnvironment roundEnvironment){
-        List<AnnotatedActivity> annotatedActivityList = new ArrayList<>();
+        List<AnnotatedClass> annotatedClassList = new ArrayList<>();
         for(Element element : roundEnvironment.getElementsAnnotatedWith(NavComponent.class)){
             if(element.getKind() != ElementKind.CLASS){
                 messager.printMessage(Diagnostic.Kind.ERROR, "@NavComponent should be on top of classes");
                 return true;
             }
             if (isClassFragment(element)) {
+                annotatedClassList.add(new AnnotatedFragment(element, instance));
             }else {
-                AnnotatedActivity annotatedActivity = new AnnotatedActivity(element, instance);
-                annotatedActivityList.add(annotatedActivity);
+                annotatedClassList.add(new AnnotatedActivity(element, instance));
             }
         }
-
-        for (AnnotatedActivity annotatedActivity : annotatedActivityList) {
+        for (AnnotatedClass annotatedActivity : annotatedClassList) {
             String packageName = annotatedActivity.getPackageName();
-            TypeSpec typeSpec = annotatedActivity.getTypeSpec2();
+            TypeSpec typeSpec = annotatedActivity.getTypeSpec();
             createFile(packageName, typeSpec);
         }
         return false;

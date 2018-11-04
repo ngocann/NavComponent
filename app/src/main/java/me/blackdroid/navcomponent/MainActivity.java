@@ -5,8 +5,8 @@ import android.os.Bundle;
 
 import me.blackdroid.annotation.NavComponents;
 import me.blackdroid.navcomponent.test.DetailActivity;
-import me.blackdroid.navcomponent.test.DetailActivityKotlin;
 import me.blackdroid.navcomponent.test.Info;
+import me.blackdroid.navcomponent.test.NavFragmentNavComponent;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -17,7 +17,13 @@ public class MainActivity extends AppCompatActivity {
         Info info = new Info();
         info.setName("name");
         info.setAge("age");
-        NavComponents.start(this, DetailActivityKotlin.class, "bbb", 13, info);
+
+//        NavComponents.start(this, DetailActivityKotlin.class, "bbb", 13, info);
+
+        getSupportFragmentManager().beginTransaction()
+                .add(R.id.frame, NavFragmentNavComponent.newInstance("username", 12))
+                .commit()
+        ;
     }
 
 
