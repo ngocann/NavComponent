@@ -34,67 +34,15 @@ import me.blackdroid.annotation.Extra;
 import me.blackdroid.annotation.ExtraParcel;
 import me.blackdroid.processor.ModifierUtils;
 
-public class AnnotatedActivity {
-    String packageName;
-    private List<AnnotatedField> requiredExtraList = new ArrayList<>();
-    private Element annotatedElement;
-    TypeName typeNameClass;
-    private String classSimpleName;
-    private ProcessingEnvironment processingEnvironment;
-    private Map<String, ExecutableElement> setterMethods = new HashMap<>();
-    private Messager messager;
+public class AnnotatedActivity  extends AnnotatedClass{
 
     public AnnotatedActivity(Element annotatedElement, ProcessingEnvironment processingEnvironment) {
-        this.messager = processingEnvironment.getMessager();
-        this.annotatedElement = annotatedElement;
-        this.packageName = getPackageName(annotatedElement);
-        typeNameClass = TypeName.get(annotatedElement.asType());
-        classSimpleName = annotatedElement.getSimpleName().toString();
-        this.processingEnvironment = processingEnvironment;
-        for (Element element : annotatedElement.getEnclosedElements()) {
-            checkAndAddSetterMethod(element);
-        }
-        try {
-            getExtraAnnotatedFields(annotatedElement);
-        } catch (ProcessingException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void error(Element e, String msg, Object... args) {
-        messager.printMessage(
-                Diagnostic.Kind.WARNING,
-                String.format(msg, args),
-                e);
-    }
-
-    public void checkAndAddSetterMethod(Element classMember) {
-
-        if (classMember.getKind() == ElementKind.METHOD) {
-            ExecutableElement methodElement = (ExecutableElement) classMember;
-            String methodName = methodElement.getSimpleName().toString();
-            if (methodName.startsWith("set")) {
-                ExecutableElement existingSetter = setterMethods.get(methodName);
-                if (existingSetter != null) {
-                    // Check for better visibility
-                    if (ModifierUtils.compareModifierVisibility(methodElement, existingSetter) == -1) {
-                        // this method has better visibility so use this one
-                        setterMethods.put(methodName, methodElement);
-                    }
-                } else {
-                    setterMethods.put(methodName, methodElement);
-                }
-            }
-        }
-
-    }
-
-    public String getPackageName() {
-        return packageName;
+        super(annotatedElement, processingEnvironment);
     }
 
 
-    public TypeSpec getTypeSpec2() {
+    @Override
+    public TypeSpec getTypeSpec() {
         final String name = String.format("%sNavComponent", annotatedElement.getSimpleName());
         TypeSpec.Builder builder = TypeSpec.classBuilder(name)
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL);
@@ -183,88 +131,5 @@ public class AnnotatedActivity {
         return builder.build();
     }
 
-
-    public TypeName getClassName() {
-        return typeNameClass;
-    }
-
-    private String getPackageName(Element e) {
-        while (!(e instanceof PackageElement)) {
-            e = e.getEnclosingElement();
-        }
-        return ((PackageElement) e).getQualifiedName().toString();
-    }
-
-
-    private void getExtraAnnotatedFields(Element annotatedElement) throws ProcessingException {
-        for (Element e : annotatedElement.getEnclosedElements()) {
-            if (e.getAnnotation(Extra.class) != null) {
-                requiredExtraList.add(new ExtraAnnotatedField(e, e.getAnnotation(Extra.class)));
-            } else if (e.getAnnotation(ExtraParcel.class) != null) {
-                requiredExtraList.add(new ExtraParcelAnnotatedField(e, e.getAnnotation(ExtraParcel.class)));
-            }
-        }
-    }
-
-    public ExecutableElement findSetterForField(AnnotatedField field) {
-
-        String fieldName = field.getVariableName();
-        StringBuilder builder = new StringBuilder("set");
-        if (fieldName.length() == 1) {
-            builder.append(fieldName.toUpperCase());
-        } else {
-            builder.append(Character.toUpperCase(fieldName.charAt(0)));
-            builder.append(fieldName.substring(1));
-        }
-
-        String methodName = builder.toString();
-        ExecutableElement setterMethod = setterMethods.get(methodName);
-        if (setterMethod != null && isSetterApplicable(field, setterMethod)) {
-            return setterMethod; // setter method found
-        }
-
-        // Search for setter method with hungarian notion check
-        if (field.getName().length() > 1 && field.getName().matches("m[A-Z].*")) {
-            // m not in lower case
-            String hungarianMethodName = "set" + field.getName();
-            setterMethod = setterMethods.get(hungarianMethodName);
-            if (setterMethod != null && isSetterApplicable(field, setterMethod)) {
-                return setterMethod; // setter method found
-            }
-
-            // M in upper case
-            hungarianMethodName = "set" + Character.toUpperCase(field.getName().charAt(0)) + field.getName().substring(1);
-            setterMethod = setterMethods.get(hungarianMethodName);
-            if (setterMethod != null && isSetterApplicable(field, setterMethod)) {
-                return setterMethod; // setter method found
-            }
-        }
-
-        // Kotlin special boolean character treatment
-        // Fields prefixed with "is" are not accessible through "setIsFoo" but with "setFoo"
-        if (field.getName().length() > 1 && field.getName().matches("is[A-Z].*")) {
-            String setterName = "set" + field.getName().substring(2);
-            setterMethod = setterMethods.get(setterName);
-            if (setterMethod != null && isSetterApplicable(field, setterMethod)) {
-                return setterMethod; // setter method found
-            }
-        }
-        error(field.getElement(), "aaafindSetterForField");
-        return null;
-
-
-    }
-
-    private boolean isSetterApplicable(AnnotatedField field, ExecutableElement setterMethod) {
-
-        List<? extends VariableElement> parameters = setterMethod.getParameters();
-        if (parameters == null || parameters.size() != 1) {
-            return false;
-        }
-
-        VariableElement parameter = parameters.get(0);
-        return parameter.asType().equals(field.getElement().asType());
-
-    }
 
 }

@@ -2,7 +2,6 @@ package me.blackdroid.annotation;
 
 import android.app.Activity;
 import android.content.Context;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -18,6 +17,29 @@ public class NavComponents {
         instantiateBinder(activity, suffix);
     }
 
+    public static void bind(Object fragment) {
+        instantiateBinder(fragment, suffix);
+    }
+
+    private static void instantiateBinder(Object target, String suffix) {
+        Class<?> targetClass = target.getClass();
+        String className = targetClass.getName();
+        try {
+            Class<?> bindingClass = targetClass
+                    .getClassLoader()
+                    .loadClass(className + suffix);
+            Method method = bindingClass.getMethod("inject", targetClass);
+            method.invoke(null, target);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("Unable to find Class for " + className + suffix, e);
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException("Unable to find constructor for " + className + suffix, e);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+    }
     public static <T> void start(Context context, Class<T> clazz, Object ... objects) {
         String className = clazz.getName();
         try {
@@ -77,4 +99,5 @@ public class NavComponents {
             throw new RuntimeException("Unable to find constructor for " + className + suffix, e);
         }
     }
+
 }
