@@ -28,4 +28,8 @@ public class ExtraAnnotatedField extends AnnotatedField<Extra>{
     String getKeyAnnotation() {
         return this.annotation.key();
     }
+
+    public boolean isParceler() {
+        return this.annotation.parceler();
+    }
 }

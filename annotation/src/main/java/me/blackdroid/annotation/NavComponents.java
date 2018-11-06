@@ -13,9 +13,9 @@ public class NavComponents {
 
     }
 
-    public static <T extends Activity> void bind(T activity) {
-        instantiateBinder(activity, suffix);
-    }
+//    public static <T extends Activity> void bind(T activity) {
+//        instantiateBinder(activity, suffix);
+//    }
 
     public static void bind(Object fragment) {
         instantiateBinder(fragment, suffix);
@@ -40,6 +40,7 @@ public class NavComponents {
             e.printStackTrace();
         }
     }
+
     public static <T> void start(Context context, Class<T> clazz, Object ... objects) {
         String className = clazz.getName();
         try {
@@ -68,6 +69,32 @@ public class NavComponents {
             throw new RuntimeException("Unable to create instance.", e);
         }
     }
+
+    public static <T> T newInstance(Class<T> clazz, Object ... objects) {
+        String className = clazz.getName();
+        try {
+            Class<?> bindingClass = clazz
+                    .getClassLoader()
+                    .loadClass(className + suffix);
+            Class<?>[] paraClassTypeArray = new Class<?>[objects.length];
+            Object[] paraClassObjectArray = new Object[objects.length];
+            for (int i = 0; i < objects.length; i++) {
+                paraClassTypeArray[i] = objects[i].getClass();
+                paraClassObjectArray[i] = objects[i];
+            }
+            Method method = bindingClass.getMethod("newInstance", paraClassTypeArray);
+            return (T) method.invoke(null, paraClassObjectArray);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("Unable to find Class for " + className + suffix, e);
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException("Unable to find Method for " + className + suffix + "start()" , e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException("Unable to invoke " + className + suffix, e);
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException("Unable to create instance.", e);
+        }
+    }
+
 
     private static <T extends Activity> void instantiateBinder(T target, String suffix) {
         Class<?> targetClass = target.getClass();
