@@ -15,8 +15,7 @@ import me.blackdroid.annotation.NavComponents;
 
 @NavComponent
 public class NavFragment extends Fragment {
-    @Extra
-    public String userName;
+    @Extra public String userName;
     @Extra public Integer age;
 
     @Nullable
