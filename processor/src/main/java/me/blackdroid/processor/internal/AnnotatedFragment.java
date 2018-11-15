@@ -74,7 +74,7 @@ public class AnnotatedFragment extends AnnotatedClass{
             if (useSetter) {
                 ExecutableElement setterMethodElement = findSetterForField(field);
                 setterMethod = setterMethodElement.getSimpleName().toString();
-                if (field instanceof ExtraAnnotatedField) {
+                if (field instanceof ExtraAnnotatedField && !((ExtraAnnotatedField) field).isParceler()) {
                     injectMethod.beginControlFlow("if (bundle.containsKey($S))", field.getKey())
                             .addStatement("fragment.$N(($T) bundle.get$N($S))", setterMethod, field.getTypeName(), op,  field.getKey())
                             .nextControlFlow("else")
@@ -88,7 +88,7 @@ public class AnnotatedFragment extends AnnotatedClass{
                             .endControlFlow();
                 }
             } else {
-                if (field instanceof ExtraAnnotatedField) {
+                if (field instanceof ExtraAnnotatedField && !((ExtraAnnotatedField) field).isParceler()) {
                     injectMethod.beginControlFlow("if (bundle.containsKey($S))", field.getKey())
                             .addStatement("fragment.$N = ($T) bundle.get$N($S)", field.getName(), field.getElement().asType(),  op, field.getKey())
                             .nextControlFlow("else")
@@ -116,7 +116,11 @@ public class AnnotatedFragment extends AnnotatedClass{
         for (AnnotatedField field : requiredExtraList) {
             startMethod.addParameter(field.getTypeName(), field.getName());
             String op = getOperation(field);
-            startMethod.addStatement("bundle.put$N($S,$N)", op, field.getKey(), field.getName() );
+            if (field instanceof ExtraAnnotatedField && !((ExtraAnnotatedField) field).isParceler()) {
+                startMethod.addStatement("bundle.put$N($S,$N)", op, field.getKey(), field.getName() );
+            }else {
+                startMethod.addStatement("bundle.putParcelable($S, $T.wrap($N))", field.getKey(), Parcels.class, field.getName());
+            }
         }
         startMethod.addStatement("fragment.setArguments(bundle)");
         startMethod.addStatement("return fragment");

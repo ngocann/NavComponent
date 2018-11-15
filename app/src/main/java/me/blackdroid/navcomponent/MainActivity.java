@@ -4,10 +4,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import me.blackdroid.annotation.NavComponents;
-import me.blackdroid.navcomponent.test.DetailActivity;
 import me.blackdroid.navcomponent.test.Info;
 import me.blackdroid.navcomponent.test.NavFragment;
-import me.blackdroid.navcomponent.test.NavFragmentNavComponent;
 
 public class MainActivity extends AppCompatActivity {
 
