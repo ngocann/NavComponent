@@ -158,7 +158,7 @@ public abstract class AnnotatedClass {
         }
 
         VariableElement parameter = parameters.get(0);
-        return parameter.asType().equals(field.getElement().asType());
+        return parameter.asType().toString().equals(field.getElement().asType().toString());
 
     }
 

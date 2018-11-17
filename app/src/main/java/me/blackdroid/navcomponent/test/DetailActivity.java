@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.widget.Toast;
 
+import java.util.List;
+
 import me.blackdroid.annotation.Extra;
 import me.blackdroid.annotation.NavComponent;
 import me.blackdroid.annotation.NavComponents;
@@ -18,6 +20,13 @@ public class DetailActivity extends BaseActivity {
    Integer value = 0;
    @Extra(parceler = true, key = "BUNDLE_INFO")
    Info info;
+
+    @Extra(parceler = true, key = "BUNDLE_INFO1")
+    private List<Info> infoList;
+
+    public void setInfoList(List<Info> infoList) {
+        this.infoList = infoList;
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
