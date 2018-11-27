@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -26,6 +27,7 @@ import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
 
+import me.blackdroid.annotation.Extra;
 import me.blackdroid.annotation.NavComponent;
 import me.blackdroid.processor.internal.AnnotatedActivity;
 import me.blackdroid.processor.internal.AnnotatedClass;
@@ -111,7 +113,11 @@ public class NavComponentProcessor extends AbstractProcessor{
 
     @Override
     public Set<String> getSupportedAnnotationTypes() {
-        return Collections.singleton(NavComponent.class.getCanonicalName());
+        Set<String> supportTypes = new LinkedHashSet<String>();
+        supportTypes.add(Extra.class.getCanonicalName());
+        supportTypes.add(NavComponent.class.getCanonicalName());
+        return supportTypes;
+
     }
 
     @Override
